@@ -1,0 +1,6 @@
+/target
+/demo-out
+*.log
+*.pyc
+.DS_Store
+Thumbs.db

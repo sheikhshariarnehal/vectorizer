@@ -1,0 +1,9 @@
+[package]
+name = "vectorizer-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Pure-Rust geometric vectorization engine: Oklab quantization, sub-pixel AA inversion, planar-map topology, multi-primitive fitting."
+
+[dependencies]
+rayon = "1.10"

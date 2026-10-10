@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vectorizer Studio – Classical Geometric Vector Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo-icon">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="16,3 29,10 29,22 16,29 3,22 3,10" stroke="url(#logo-grad)" stroke-width="2.5" fill="rgba(0, 229, 255, 0.08)"/>
+          <circle cx="16" cy="16" r="5" fill="url(#logo-grad)"/>
+          <line x1="16" y1="3" x2="16" y2="11" stroke="#00e5ff" stroke-width="2"/>
+          <line x1="29" y1="22" x2="20" y2="18" stroke="#6366f1" stroke-width="2"/>
+          <line x1="3" y1="22" x2="12" y2="18" stroke="#a855f7" stroke-width="2"/>
+          <defs>
+            <linearGradient id="logo-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00e5ff"/>
+              <stop offset="0.5" stop-color="#6366f1"/>
+              <stop offset="1" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">VECTORIZER</span>
+        <span class="brand-tag">STUDIO</span>
+      </div>
+    </div>
+
+    <!-- Demo Scenes Selector -->
+    <div class="demo-scenes-bar">
+      <span class="bar-label">DEMO SCENES:</span>
+      <div class="scene-buttons" id="sceneButtons">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/bmp" style="display:none;">
+      <button class="btn btn-secondary" id="btnUpload" title="Load custom raster image">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Open Image</span>
+      </button>
+
+      <button class="btn btn-primary" id="btnVectorize" title="Re-run vectorization with current parameters">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Vectorize</span>
+      </button>
+
+      <!-- Export Dropdown -->
+      <div class="dropdown-wrapper">
+        <button class="btn btn-export" id="btnExportMenu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Export</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dropdown-menu" id="exportDropdown">
+          <a class="dropdown-item" data-export="svg">
+            <span class="fmt-icon svg-icon">SVG</span>
+            <div class="fmt-info">
+              <span class="fmt-name">Scalable Vector Graphics</span>
+              <span class="fmt-desc">Clean, optimized XML vector paths</span>
+            </div>
+          </a>
+          <a class="dropdown-item" data-export="dxf">
+            <span class="fmt-icon dxf-icon">DXF</span>
+            <div class="fmt-info">
+              <span class="fmt-name">AutoCAD 2000 (AC1015)</span>
+              <span class="fmt-desc">Native lines, arcs, polylines for CAD/CNC/Laser</span>
+            </div>
+          </a>
+          <a class="dropdown-item" data-export="pdf">
+            <span class="fmt-icon pdf-icon">PDF</span>
+            <div class="fmt-info">
+              <span class="fmt-name">Vector PDF</span>
+              <span class="fmt-desc">High-precision vector document for print</span>
+            </div>
+          </a>
+          <a class="dropdown-item" data-export="eps">
+            <span class="fmt-icon eps-icon">EPS</span>
+            <div class="fmt-info">
+              <span class="fmt-name">Encapsulated PostScript</span>
+              <span class="fmt-desc">Legacy publishing vector format</span>
+            </div>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" data-export="overlay">
+            <span class="fmt-icon ovl-icon">OVL</span>
+            <div class="fmt-info">
+              <span class="fmt-name">Color-Coded Primitive Overlay</span>
+              <span class="fmt-desc">Inspected Lines, Arcs, Béziers & Nodes</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Studio Layout -->
+  <main class="studio-main">
+    <!-- Center Viewport & Canvas -->
+    <div class="viewport-panel">
+      <!-- Viewport Toolbar -->
+      <div class="viewport-toolbar">
+        <div class="view-mode-toggle" id="viewModeGroup">
+          <button class="mode-btn active" data-mode="split" title="Synchronized Side-by-Side comparison">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+            <span>Split View</span>
+          </button>
+          <button class="mode-btn" data-mode="curtain" title="Interactive curtain divider slider">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><polygon points="7 12 11 9 11 15"/></svg>
+            <span>Curtain</span>
+          </button>
+          <button class="mode-btn" data-mode="vector" title="Vector Output only">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            <span>Vector Only</span>
+          </button>
+          <button class="mode-btn" data-mode="raster" title="Original Raster only">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Raster Only</span>
+          </button>
+        </div>
+
+        <!-- Zoom & View Tools -->
+        <div class="zoom-controls">
+          <button class="tool-btn" id="btnZoomOut" title="Zoom out (Mouse wheel down)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+          <span class="zoom-level" id="zoomLevelText">100%</span>
+          <button class="tool-btn" id="btnZoomIn" title="Zoom in (Mouse wheel up)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </button>
+          <button class="tool-btn" id="btnResetView" title="Reset Zoom & Pan (100%)">
+            <span>Reset</span>
+          </button>
+          <button class="tool-btn" id="btnFitView" title="Fit to screen">
+            <span>Fit</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas Container -->
+      <div class="canvas-viewport" id="canvasViewport">
+        <!-- Drag & Drop Overlay Indicator -->
+        <div class="drop-overlay" id="dropOverlay">
+          <div class="drop-indicator">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p>Drop Image File to Vectorize</p>
+            <span>Supports PNG, JPEG, WebP, BMP</span>
+          </div>
+        </div>
+
+        <!-- Transform Layer containing canvases -->
+        <div class="canvas-stage" id="canvasStage">
+          <!-- Split / Single Canvas Render Area -->
+          <div class="view-container" id="viewContainer">
+            <!-- Left: Raster Frame -->
+            <div class="canvas-frame frame-raster" id="frameRaster">
+              <div class="frame-tag">Original Raster</div>
+              <img id="rasterImg" alt="Original Raster" crossorigin="anonymous">
+            </div>
+
+            <!-- Curtain Divider (visible in curtain mode) -->
+            <div class="curtain-divider" id="curtainDivider">
+              <div class="curtain-handle">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/><polyline points="9 18 3 12 9 6"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/><polyline points="15 18 21 12 15 6"/></svg>
+              </div>
+            </div>
+
+            <!-- Right: Vector Frame -->
+            <div class="canvas-frame frame-vector" id="frameVector">
+              <div class="frame-tag">Sub-Pixel Vector Result</div>
+              <div class="vector-svg-host" id="vectorSvgHost"></div>
+              <!-- Primitive Overlay Layer -->
+              <div class="vector-overlay-host" id="vectorOverlayHost"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Primitive Inspector HUD -->
+        <div class="primitive-hud" id="primitiveHud">
+          <div class="hud-header">
+            <span class="hud-title">Primitive Inspector</span>
+            <label class="hud-toggle-switch">
+              <input type="checkbox" id="chkToggleAllPrimitives" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="hud-chips">
+            <label class="chip chip-lines" title="Straight Lines (TLS Orthogonal Fit)">
+              <input type="checkbox" id="chkShowLines" checked>
+              <span class="dot line-dot"></span>
+              <span class="name">Lines</span>
+              <span class="badge" id="badgeCountLines">0</span>
+            </label>
+            <label class="chip chip-arcs" title="Circular Arcs (Pratt Algebraic Fit)">
+              <input type="checkbox" id="chkShowArcs" checked>
+              <span class="dot arc-dot"></span>
+              <span class="name">Arcs</span>
+              <span class="badge" id="badgeCountArcs">0</span>
+            </label>
+            <label class="chip chip-circles" title="Native Full Circles">
+              <input type="checkbox" id="chkShowCircles" checked>
+              <span class="dot circle-dot"></span>
+              <span class="name">Circles</span>
+              <span class="badge" id="badgeCountCircles">0</span>
+            </label>
+            <label class="chip chip-beziers" title="Adaptive Cubic Béziers (Schneider Spline)">
+              <input type="checkbox" id="chkShowBeziers" checked>
+              <span class="dot bezier-dot"></span>
+              <span class="name">Béziers</span>
+              <span class="badge" id="badgeCountBeziers">0</span>
+            </label>
+            <label class="chip chip-nodes" title="Corner Junctions & Discontinuities">
+              <input type="checkbox" id="chkShowNodes" checked>
+              <span class="dot node-dot"></span>
+              <span class="name">Nodes</span>
+              <span class="badge" id="badgeCountNodes">0</span>
+            </label>
+          </div>
+          <div class="hud-slider-row">
+            <span class="hud-sublabel">Overlay Opacity</span>
+            <input type="range" id="rngOverlayOpacity" min="10" max="100" value="85">
+            <span class="hud-val" id="valOverlayOpacity">85%</span>
+          </div>
+        </div>
+
+        <!-- Status Bottom Overlay Bar -->
+        <div class="viewport-status-bar">
+          <div class="status-left">
+            <span class="stat-badge stat-latency" id="statLatencyBadge">⚡ 0.0 ms</span>
+            <span class="stat-badge" id="statResolutionBadge">512 × 512 px</span>
+            <span class="stat-badge" id="statPaletteBadge">3 Colors</span>
+            <span class="stat-badge" id="statShapesBadge">4 Shapes</span>
+          </div>
+          <div class="status-right">
+            <span class="stat-info" id="statusCrosshairInfo">Drag to pan · Scroll to zoom</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Configuration Sidebar -->
+    <aside class="sidebar-panel">
+      <!-- Section: Algorithm Presets -->
+      <section class="sidebar-section">
+        <div class="section-title">
+          <span>ALGORITHM PRESET</span>
+        </div>
+        <div class="preset-cards">
+          <div class="preset-card active" data-preset="balanced">
+            <div class="preset-header">
+              <span class="preset-icon">⚖️</span>
+              <span class="preset-name">Balanced</span>
+            </div>
+            <span class="preset-desc">General logos, vector illustrations & icons</span>
+          </div>
+
+          <div class="preset-card" data-preset="cad">
+            <div class="preset-header">
+              <span class="preset-icon">📐</span>
+              <span class="preset-name">CAD / CNC</span>
+            </div>
+            <span class="preset-desc">Strict lines, 90°/45° angle snapping, arc priority</span>
+          </div>
+
+          <div class="preset-card" data-preset="artistic">
+            <div class="preset-header">
+              <span class="preset-icon">🎨</span>
+              <span class="preset-name">Artistic</span>
+            </div>
+            <span class="preset-desc">Smooth freeform Bézier curves & soft organic forms</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Performance Timings Breakdown -->
+      <section class="sidebar-section">
+        <div class="section-title">
+          <span>ENGINE BENCHMARK BREAKDOWN</span>
+        </div>
+        <div class="timing-meters">
+          <div class="meter-row">
+            <span class="meter-label">Prepare & Denoise</span>
+            <div class="meter-bar-wrap"><div class="meter-fill" id="meterFillPrep" style="width: 25%"></div></div>
+            <span class="meter-val" id="valMeterPrep">0.0 ms</span>
+          </div>
+          <div class="meter-row">
+            <span class="meter-label">Oklab K-Means Quantize</span>
+            <div class="meter-bar-wrap"><div class="meter-fill" id="meterFillQuant" style="width: 50%"></div></div>
+            <span class="meter-val" id="valMeterQuant">0.0 ms</span>
+          </div>
+          <div class="meter-row">
+            <span class="meter-label">Planar Graph Topology</span>
+            <div class="meter-bar-wrap"><div class="meter-fill" id="meterFillTopo" style="width: 15%"></div></div>
+            <span class="meter-val" id="valMeterTopo">0.0 ms</span>
+          </div>
+          <div class="meter-row">
+            <span class="meter-label">Multi-Primitive Fit</span>
+            <div class="meter-bar-wrap"><div class="meter-fill" id="meterFillFit" style="width: 10%"></div></div>
+            <span class="meter-val" id="valMeterFit">0.0 ms</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Palette & Color Clustering -->
+      <section class="sidebar-section">
+        <div class="section-title">
+          <span>PALETTE QUANTIZATION (OKLAB)</span>
+        </div>
+        <div class="control-row">
+          <div class="control-label-group">
+            <label for="rngColors">Palette Size K</label>
+            <span class="control-val" id="valColors">16</span>
+          </div>
+          <input type="range" id="rngColors" min="2" max="64" value="16">
+        </div>
+        <div class="palette-swatches-card" id="paletteSwatches">
+          <!-- Rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- Section: Geometric Tolerances -->
+      <section class="sidebar-section">
+        <div class="section-title">
+          <span>GEOMETRIC FITTING TOLERANCES</span>
+        </div>
+
+        <div class="control-row">
+          <div class="control-label-group">
+            <label for="rngLineTol">Line Tolerance</label>
+            <span class="control-val" id="valLineTol">0.80 px</span>
+          </div>
+          <input type="range" id="rngLineTol" min="0.1" max="3.0" step="0.05" value="0.80">
+        </div>
+
+        <div class="control-row">
+          <div class="control-label-group">
+            <label for="rngArcTol">Arc Tolerance</label>
+            <span class="control-val" id="valArcTol">0.70 px</span>
+          </div>
+          <input type="range" id="rngArcTol" min="0.1" max="3.0" step="0.05" value="0.70">
+        </div>
+
+        <div class="control-row">
+          <div class="control-label-group">
+            <label for="rngCurveTol">Bézier Curve Tolerance</label>
+            <span class="control-val" id="valCurveTol">0.80 px</span>
+          </div>
+          <input type="range" id="rngCurveTol" min="0.1" max="3.0" step="0.05" value="0.80">
+        </div>
+
+        <div class="control-row">
+          <div class="control-label-group">
+            <label for="rngCorner">Corner Threshold</label>
+            <span class="control-val" id="valCorner">135°</span>
+          </div>
+          <input type="range" id="rngCorner" min="90" max="160" step="1" value="135">
+        </div>
+
+        <div class="control-row">
+          <div class="control-label-group">
+            <label for="rngSnap">Angle Snapping</label>
+            <span class="control-val" id="valSnap">2.0°</span>
+          </div>
+          <input type="range" id="rngSnap" min="0" max="10" step="0.5" value="2.0">
+        </div>
+      </section>
+
+      <!-- Section: Topology Mode -->
+      <section class="sidebar-section">
+        <div class="section-title">
+          <span>TOPOLOGY GRAPH ARCHITECTURE</span>
+        </div>
+        <div class="topology-options">
+          <label class="radio-card active" id="lblCutout">
+            <input type="radio" name="topologyMode" value="cutout" checked>
+            <div class="radio-content">
+              <span class="radio-title">Planar Cutout (Half-Edge)</span>
+              <span class="radio-desc">Shared boundaries: 0 white gaps, 0 overlap bleeds</span>
+            </div>
+          </label>
+          <label class="radio-card" id="lblStacked">
+            <input type="radio" name="topologyMode" value="stacked">
+            <div class="radio-content">
+              <span class="radio-title">Stacked Layers (Vinyl / CNC)</span>
+              <span class="radio-desc">Sorts by area, fills holes for vinyl cutters & lasers</span>
+            </div>
+          </label>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
